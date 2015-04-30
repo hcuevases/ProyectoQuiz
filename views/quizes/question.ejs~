@@ -9,7 +9,7 @@
 <h2> Quiz: JUEGOOO</h2>
 
 <form method= "get" action="/quizes/answer">
-	Pregunta:Capital de Italia <% pregunta %><p>
+	Pregunta: <% pregunta %><p>
 
 <input type="text" name="respuesta" value= "responda aqui"/>
 <input type="submit" value="Enviar"/>
