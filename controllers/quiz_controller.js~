@@ -1,19 +1,27 @@
-var models = require('../models/models.js'); //para acceder a la BBDD,
-//ya que el módulo models.js exporta "Quiz"
+var models = require('../models/models.js'); 
 
-//Quiz 10: Autoload. Factoriza el código si la ruta incluye :quizId
-exports.load = function(req,res,next,quizId) {
-	models.Quiz.find(quizId).then( 
-		function(quiz) {
-			if (quiz) { req.quiz = quiz; next(); }
-			else next(new Error('No existe el quiz con ID='+quizId));
-		}).catch(function(error) { next(error);});
+
+exports.load = function(req, res, next, quizId) {
+models.Quiz.find({
+where: {
+id: Number(quizId)
+},
+include: [{
+model: models.Comment
+}]
+}).then(function(quiz) {
+if (quiz) {
+req.quiz = quiz;
+next();
+} else{next(new Error('No existe quizId=' + quizId))}
+}
+).catch(function(error){next(error)});
 };
 
-//Get /quizes
+
 exports.index = function(req,res) {
 	if (req.query.busqueda != null) {
-		var search = '%'+req.query.busqueda+'%'; //para buscar palabras intermedias
+		var search = '%'+req.query.busqueda+'%'; 
 		models.Quiz.findAll({where: ["pregunta like ?", search]})
 		.then(function (quizes) {
 			res.render('quizes/index', {quizes: quizes});
@@ -25,10 +33,54 @@ exports.index = function(req,res) {
 		});
 	}
 };
-//Get /quizes/:id
-exports.show = function(req,res) { //para la lista de preguntas
+
+exports.show = function(req,res) { 
 	res.render('quizes/show', { quiz: req.quiz} );
 };
+
+
+exports.new = function(req, res) {
+var quiz = models.Quiz.build( // crea objeto quiz
+{pregunta: "Pregunta", respuesta: "Respuesta"}
+);
+res.render('quizes/new', {quiz: quiz, errors: []});
+};
+
+
+exports.create = function(req, res) {
+
+var quiz = models.Quiz.build( req.body.quiz );
+
+quiz.save({fields: ["pregunta", "respuesta"]}).then( function(){ res.redirect('/quizes');
+})
+};
+
+////////////////////////////////
+exports.update = function(req, res) {
+
+req.quiz.pregunta = req.body.quiz.pregunta;
+req.quiz.respuesta = req.body.quiz.respuesta;
+req.quiz
+.validate()
+.then(
+function(err){
+if (err) {
+res.render('quizes/edit', {quiz: req.quiz, errors: err.errors});
+} else {
+req.quiz 
+.save( {fields: ["pregunta", "respuesta"]})
+.then( function(){ res.redirect('/quizes');});
+} 
+}
+);
+};
+////////////////////////////////////////
+
+exports.edit = function(req, res) {
+var quiz = req.quiz; 
+res.render('quizes/edit', {quiz: quiz, errors: []});
+};
+
 
 exports.answer = function(req,res) {
 	if (req.query.respuesta === req.quiz.respuesta)

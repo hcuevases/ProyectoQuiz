@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Quiz<%= title %></title>
+    
+  </head>
+  <body>
+    <h1>Bienvenido a <%= title %></h1>
+    <p>El portal extremo! <%= title %></p>
+    <p><a href ="/quizes">A jugar!</a></p>
+
+    
+  </body>
+</html>
