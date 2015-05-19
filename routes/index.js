@@ -11,9 +11,9 @@ router.get('/', function(req, res) {
   res.render('index', { title: 'Quiz!' , errors: []});
 });
 //autoload
-router.param('quizId', quizController.load);  
-router.param('commentId', commentController.load);  
-router.param('userId', userController.load); 
+//router.param('quizId', quizController.load);  
+//router.param('commentId', commentController.load);  
+//router.param('userId', userController.load); 
 
 router.get('/author', function(req, res, next) {
   res.render('author', { title: 'Datos del autor!' });
