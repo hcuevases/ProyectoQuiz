@@ -6,7 +6,7 @@ var commentController = require('../controllers/comment_controller');
 var sessionController = require('../controllers/session_controller');
 
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Quiz!' });
+  res.render('index', { title: 'Quiz!' , errors: []});
 });
 
 router.get('/author', function(req, res, next) {
@@ -19,11 +19,14 @@ router.get('/quizes/:quizId(\\d+)', quizController.show);
 router.get('/quizes/:quizId(\\d+)/answer', quizController.answer);
 router.get('/quizes?busqueda=:busqueda(\\w)', quizController.index);
 router.param('quizId', quizController.load);
-router.get('/quizes/new' , quizController.new);
-router.post('/quizes/create' , quizController.create);
+router.get('/quizes/new' , sessionController.loginRequired, quizController.new);
+router.post('/quizes/create' ,sessionController.loginRequired, quizController.create);
 
-router.get('/quizes/:quizId(\\d+)/edit', quizController.edit);
-router.put('/quizes/:quizId(\\d+)', quizController.update);
+router.get('/quizes/:quizId(\\d+)/edit',sessionController.loginRequired, quizController.edit);
+
+router.put('/quizes/:quizId(\\d+)',sessionController.loginRequired, quizController.update);
+router.delete('/quizes/:quizId(\\d+)',sessionController.loginRequired, quizController.destroy);
+
 
 router.get('/quizes/:quizId(\\d+)/comments/new', commentController.new);
 router.post('/quizes/:quizId(\\d+)/comments', commentController.create);

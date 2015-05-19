@@ -18,14 +18,14 @@ next();
 ).catch(function(error){next(error)});
 };
 
-
+//////////////////////////////////////
 exports.index = function(req,res) {
 	if (req.query.busqueda != null) {
 		var search = '%'+req.query.busqueda+'%'; 
 		models.Quiz.findAll({where: ["pregunta like ?", search]})
 		.then(function (quizes) {
-			res.render('quizes/index', {quizes: quizes});
-		});
+			res.render('quizes/index', {quizes: quizes, errors:[]});
+		}).catch(function(error){next(error)});
 	}
 	else {
 		models.Quiz.findAll().then(function (quizes) {
@@ -33,12 +33,12 @@ exports.index = function(req,res) {
 		});
 	}
 };
-
+////////////////////////////////////
 exports.show = function(req,res) { 
 	res.render('quizes/show', { quiz: req.quiz} );
 };
 
-
+////////////////////////////////////
 exports.new = function(req, res) {
 var quiz = models.Quiz.build( // crea objeto quiz
 {pregunta: "Pregunta", respuesta: "Respuesta"}
@@ -46,7 +46,7 @@ var quiz = models.Quiz.build( // crea objeto quiz
 res.render('quizes/new', {quiz: quiz, errors: []});
 };
 
-
+////////////////////////////////////
 exports.create = function(req, res) {
 
 var quiz = models.Quiz.build( req.body.quiz );
@@ -80,8 +80,14 @@ exports.edit = function(req, res) {
 var quiz = req.quiz; 
 res.render('quizes/edit', {quiz: quiz, errors: []});
 };
+/////////////////////////////////////////////
 
-
+exports.destroy = function(req, res){
+	req.quiz.destroy().then( function(){
+	 res.redirect('/quizes');
+	}).catch(function(error) {next(error)});
+};
+//////////////////////////////////////
 exports.answer = function(req,res) {
 	if (req.query.respuesta === req.quiz.respuesta)
 		res.render('quizes/answer', {respuesta: 'Correcto', quizId: req.quiz.id});
