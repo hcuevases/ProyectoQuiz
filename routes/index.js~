@@ -10,6 +10,7 @@ var userController = require('../controllers/user_controller');
 router.get('/', function(req, res) {
   res.render('index', { title: 'Quiz!' , errors: []});
 });
+
 //autoload
 router.param('quizId', quizController.load);  
 router.param('commentId', commentController.load);  
@@ -20,11 +21,11 @@ router.get('/author', function(req, res, next) {
 });
 
 
-router.get('/quizes', quizController.index);//
+router.get('/quizes', quizController.index);
 router.get('/quizes/:quizId(\\d+)', quizController.show);
 router.get('/quizes/:quizId(\\d+)/answer', quizController.answer);
 router.get('/quizes?busqueda=:busqueda(\\w)', quizController.index);
-router.param('quizId', quizController.load);
+
 router.get('/quizes/new' , sessionController.loginRequired, quizController.new);
 router.post('/quizes/create' ,sessionController.loginRequired, quizController.create);
 router.get('/quizes/:quizId(\\d+)/edit',sessionController.loginRequired, quizController.edit);

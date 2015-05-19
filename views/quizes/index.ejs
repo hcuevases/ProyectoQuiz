@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset= "utf-8">
-<title> Quiz </title>
-<link rel='stylesheet' href='/stylesheets/style.css'/>
-</head>
-<body>
+<!--Cajetín de búsqueda -->
 
 <form method="get" action="/quizes">
 	Buscar: 
@@ -15,27 +8,31 @@
 
 <table>
 	
-	<% var i;
-		for (i=0; i<quizes.length; i++) { %>
-<tr>
-<td><a href="quizes/<%= quizes[i].id %>"><%= quizes[i].pregunta %>
-</a></td>
-
-<%if(session.user){%>
-<td><a href="quizes/<%= quizes[i].id %>/edit"><button>Editar</button></a></td>
-<td>
- <form method="post" action="/quizes/<%= quizes[i].id %>?_method=delete">
-            <button type="submit" onClick="return confirm('Borrar: <%= quizes[i].pregunta %>');">
-              borrar
-            </button>
-          </form>
-        </td>
+	<%	for (var i=0; i<quizes.length; i++) { %>
+			<tr>
+				<td><a href="/quizes/<%= quizes[i].id %>"><%= quizes[i].pregunta %></a>
+				</td>
+				<!-- Sólo con autorización -->
+				<% if(session.user) {
+				   if (session.user.isAdmin || session.user.id === quizes[i].UserId) { %>
+					<td><a href="/quizes/<%= quizes[i].id %>/edit">
+						<button>editar</button></a>
+					</td>
+					<td>
+						<form method="post" action="/quizes/<%= quizes[i].id %>?_method=delete">
+							<button type="submit" onClick="return confirm('Borrar: <%= quizes[i].pregunta %>');">borrar</button>
+						</form>
+					</td>
+				<% } %>
+				<!-- ///////////////////// -->
+			</tr>
+		<% } %>
 	<% } %>
-</tr>
-	<% } %>
 
-</table><p>
-<a href="/quizes/new"><button type ="button"> Crear pregunta</button></a>
-</body>
-</html>
+</table>
+<p>
 
+<!-- Sólo con autorización -->
+<% if (session.user) { %>
+	<a href="/quizes/new"><button type="button">Crear pregunta</button></a>
+<% } %>

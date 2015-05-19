@@ -1,8 +1,11 @@
+//Construye la DB y el modelo.
+
 var path = require('path');
 
-// Postgres DATABASE_URL = postgres://user:passwd@host:port/database
-// SQLite   DATABASE_URL = sqlite://:@:/
+var pg = require('pg');
 
+// Postgres DATABASE_URL = postgres://user:passwd@host:port/database
+// SQLite DATABASE_URL = sqlite://:@:/
 var url = process.env.DATABASE_URL.match(/(.*)\:\/\/(.*?)\:(.*)@(.*)\:(.*)\/(.*)/);
 var DB_name 	= (url[6]||null);
 var user 		= (url[2]||null);
@@ -13,10 +16,10 @@ var port 		= (url[5]||null);
 var host 		= (url[4]||null);
 var storage 	= process.env.DATABASE_STORAGE;
 
+//Cargar Modelo ORM
 var Sequelize = require('sequelize');
 
-
-
+//Usar BBDD SQLite
 var sequelize = new Sequelize(DB_name, user, pwd,
 				{   dialect: protocol,
 					protocol: protocol,
@@ -25,25 +28,29 @@ var sequelize = new Sequelize(DB_name, user, pwd,
 					storage: storage, //sólo SQLite (.env)
 					omitNull: true //sólo Postgres
 				});
-
-var quiz_path = path.join(__dirname,'quiz');
+//Importar la definición de la tabla Quiz en quiz.js
 var Quiz = sequelize.import(path.join(__dirname, 'quiz'));
 
-var comment_path = path.join(__dirname,'comment');
-var Comment = sequelize.import(comment_path);
+//Importar la definición de la tabla Comment en comment.js
+var Comment = sequelize.import(path.join(__dirname,'comment'));
 
-var user_path =  path.join(__dirname,'user');
-var User= sequelize.import(user_path);
+//Importar la definición de la tabla User en user.js
+var User = sequelize.import(path.join(__dirname, 'user'))
 
+//---------------------------------------------------------
+//Cada User tendrá N Quizes, y cada Quiz tendrá N Comments
 Comment.belongsTo(Quiz);
 Quiz.hasMany(Comment);
+Quiz.belongsTo(User);
+User.hasMany(Quiz);
+//---------------------------------------------------------
 
-Comment.belongsTo(User);
-Quiz.hasMany(Quiz);
-
-exports.Quiz = Quiz; 
+exports.Quiz = Quiz; //exportar la definición de tabla Quiz
+//se exporta para que la definición de la tabla Quiz pueda ser
+//usada en quiz_controller.js
 exports.Comment = Comment;
-exports.User= User;
+
+exports.User = User;
 
 //Crear e inicializar la BBDD
 sequelize.sync().then(function() {
